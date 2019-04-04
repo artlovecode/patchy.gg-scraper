@@ -1,4 +1,5 @@
 import scrapy
+from items import Team
 
 url_to_region = {
             "https://lol.gamepedia.com/Category:North_American_Teams": "NA",
@@ -17,10 +18,10 @@ url_to_region = {
             }
 
 def get_teams_from_region(response):
-    return {
+    return Team({
             "name": response.xpath("//span[contains(@class, 'teamname')]/a/text()").extract(),
             "region": url_to_region[response.request.url]
-            }
+            })
 
 class Teams(scrapy.Spider):
     name = "gamepedia_teams"

@@ -8,7 +8,21 @@
 import scrapy
 
 
-class ScraperItem(scrapy.Item):
+class Player(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    name = scrapy.Field()
+    team_name = scrapy.Field()
+    position = scrapy.Field()
+    region = scrapy.Field()
+    soloqueue_ids = scrapy.Field()
+
+class Team(scrapy.Item):
+    # define the fields for your item here like:
+    name = scrapy.Field()
+    region = scrapy.Field()
+
+class SoloqueId(scrapy.Item):
+    # define the fields for your item here like:
+    name = scrapy.Field()
+    server = scrapy.Field()
+

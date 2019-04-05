@@ -1,5 +1,5 @@
 import scrapy
-from items import Team
+from ..items import Team
 
 url_to_region = {
             "https://lol.gamepedia.com/Category:North_American_Teams": "NA",

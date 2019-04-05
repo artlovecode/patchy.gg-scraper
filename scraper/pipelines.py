@@ -2,10 +2,10 @@
 
 # Define your item pipelines here
 #
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
+# Don'''t forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import psycopg2
-
+from items import Team, Player
 
 class ScraperPipeline(object):
     def open_spider(self, spider):
@@ -23,44 +23,63 @@ class ScraperPipeline(object):
         self.cur.close()
         self.db_conn.close()
 
-    def handle_team(self, item):
-        names = item["name"]
-        region = item["region"]
+    def handle_team(self, team: Team):
+        names = team["name"]
+        region = team["region"]
 
-        self.cur.execute('select id from region where name = %s;', (region,))
+        self.cur.execute('''SELECT id FROM region WHERE name = %s;''', (region,))
 
         region_id = self.cur.fetchone()[0]
 
         for name in names:
-            self.cur.execute('insert into team(name, region_id) values(%s, %s) on conflict do nothing;', (name, region_id))
+            self.cur.execute('''INSERT INTO team(name, region_id) VALUES(%s, %s) ON CONFLICT DO NOTHING;''', (name, region_id))
         self.db_conn.commit()
 
-        return item
+        return team
 
-    def handle_player(self, item):
-        name = item["name"]
-        position = item["position"]
-        team = item["team_name"]
+    def get_players_team_id(self, player: Player) -> int:
+        self.cur.execute('''SELECT id FROM team WHERE name = %s''', (player.team_name,))
+        return self.cur.fetchone()[0]
 
-        self.cur.execute('select id from team where name = %s', (team,))
-        team_id = self.cur.fetchone()[0]
-        
-        self.cur.execute('select id from position where name = %s', (position,))
-        position_id = self.cur.fetchone()
+    def get_players_position_id(self, player: Player):
+        self.cur.execute('''SELECT id FROM position WHERE name = %s''', (player.position,))
+        query_res = self.cur.fetchone()
+        if query_res is not None:
+            return query_res[0]
+        else:
+            return None
 
-        if position_id is not None:
-            position_id = position_id[0]
+    def insert_player(self, player: Player):
+        position_id = self.get_players_position_id(player)
+        self.cur.execute('''INSERT INTO player(ingame_name, position_id) VALUES(%s, %s) ON CONFLICT DO NOTHING''', (player.name, position_id))
 
-        self.cur.execute('insert into player(ingame_name, position_id) values(%s, %s) on conflict do nothing', (name, position_id))
-        self.cur.execute('select id from player where ingame_name = %s', (name,))
+    def get_player_id(self, player: Player):
+        self.cur.execute('''SELECT id FROM player WHERE name = %s;''', (player.name,))
+        return self.cur.fetchone()[0]
 
-        player_id = self.cur.fetchone()[0]
+    def insert_current_team(self, player: Player):
+        player_id = self.get_player_id(player)
+        team_id = self.get_players_team_id(player)
+        self.cur.execute('''INSERT INTO current_team(player_id, team_id) VALUES(%s, %s) ON CONFICT DO NOTHING''', (player_id, team_id))
+        pass
 
-        self.cur.execute('insert into current_team(player_id, team_id) values(%s, %s) on confict do nothing', (player_id, team_id))
+    def get_team_region(self, player: Player) -> str:
+        self.cur.execute('''SELECT region_id FROM team WHERE name = %s''', (player.team_name,))
+        region_id = self.cur.fetchone()[0]
+        self.cur.execute('''SELECT name FROM region WHERE id = %s''', (region_id,))
+        return self.cur.fetchone()[0]
 
+    def insert_soloqueue_ids(self, player: Player):
+        pass
+
+
+    def handle_player(self, player: Player):
+        self.insert_player(player)
+        self.insert_current_team(player)
+        self.insert_soloqueue_ids(player)
 
         self.db_conn.commit()
-        return item
+        return player
 
     def process_item(self, item, spider):
         if spider.name == "gamepedia_players":

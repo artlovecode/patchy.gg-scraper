@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from items import Player
+from ..items import Player
 
 def map_position(position:str) -> str:
     position_map = {

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from ..items import Player
+from ..pipelines import Player as PlayerPipeline
 
 def map_position(position:str) -> str:
     position_map = {
@@ -37,6 +38,10 @@ def get_player_data(response) -> Player:
 
 class Players(scrapy.Spider):
     name = "gamepedia_players"
+
+    pipeline = [
+        PlayerPipeline
+    ]
 
     start_urls = [
             "https://lol.gamepedia.com/Category:North_American_Teams"

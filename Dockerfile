@@ -1,4 +1,4 @@
-FROM scrapinghub/scrapinghub-stack-scrapy:1.3
+FROM scrapinghub/scrapinghub-stack-scrapy:1.6-py3
 ENV TERM xterm
 ENV SCRAPY_SETTINGS_MODULE scraper.settings
 RUN mkdir -p /app

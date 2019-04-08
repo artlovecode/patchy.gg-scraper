@@ -84,9 +84,9 @@ class PlayerPipeline(BasePipeline):
 
     def get_region_for_soloqueue_id(self, residency_region_name, soloqueue_id):
         region_in_name_rx = r"\w+\s\(\w+\)"
-        region_in_name = re.search(region_in_name, soloqueue_id)
+        region_in_name = re.search(region_in_name_rx, soloqueue_id)
         if region_in_name is not None:
-            return region_in_name
+            return region_in_name.groups()[0]
         else:
             return residency_region_name
 
@@ -100,7 +100,7 @@ class PlayerPipeline(BasePipeline):
         ids_mapped_to_regions = zip(soloqueue_ids, regions)
 
         for (soloqueue_id, region) in ids_mapped_to_regions:
-            self.cur.execute('''INSERT INTO soloqueue_id(player_id, name, region_id) VALUES(%s, %s) ON CONFLICT DO NOTHING''', (player_id, soloqueue_id, region_id))
+            self.cur.execute('''INSERT INTO soloqueue_id(player_id, name, region_id) VALUES(%s, %s, %s) ON CONFLICT DO NOTHING''', (player_id, soloqueue_id, self.fetch_region_id(region)))
 
     @check_pipeline
     def process_item(self, player, spider):

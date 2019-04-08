@@ -51,7 +51,7 @@ class PlayerPipeline(BasePipeline):
     def insert_player(self, player):
         position_id = self.fetch_player_position_id(player)
         residency_region_id = self.fetch_residency_region_id(player)
-        self.cur.execute('''INSERT INTO player(ingame_name, position_id, residency_region_id) VALUES(%s, %s, %s)''', (player['name'], position_id, residency_region_id))
+        self.cur.execute('''INSERT INTO player(ingame_name, position_id, residency_region_id) VALUES(%s, %s, %s) ON CONFLICT (ingame_name) DO UPDATE SET (residency_region_id) = (EXCLUDED.residency_region_id)''', (player['name'], position_id, residency_region_id))
 
 
     def insert_current_team(self, player):

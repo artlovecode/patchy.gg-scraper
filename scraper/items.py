@@ -14,6 +14,7 @@ class Player(scrapy.Item):
     team_name = scrapy.Field()
     position = scrapy.Field()
     region = scrapy.Field()
+    residency_region = scrapy.Field()
     soloqueue_ids = scrapy.Field()
 
 class Team(scrapy.Item):

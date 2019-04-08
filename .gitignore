@@ -105,5 +105,3 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-.mypy_cache
-scraper/.mypy_cache

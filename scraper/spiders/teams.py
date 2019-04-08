@@ -1,5 +1,6 @@
 import scrapy
 from ..items import Team
+from ..pipelines import Team as TeamPipeline
 
 url_to_region = {
             "https://lol.gamepedia.com/Category:North_American_Teams": "NA",
@@ -25,6 +26,10 @@ def get_teams_from_region(response):
 
 class Teams(scrapy.Spider):
     name = "gamepedia_teams"
+
+    pipelines = [
+        TeamPipeline
+    ]
 
     start_urls = [
             "https://lol.gamepedia.com/Category:North_American_Teams",

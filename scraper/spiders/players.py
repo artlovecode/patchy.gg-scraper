@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
+from ..pipelines import PlayerPipeline
 from ..items import Player
-from ..pipelines import Player as PlayerPipeline
 
 def map_position(position:str) -> str:
     position_map = {

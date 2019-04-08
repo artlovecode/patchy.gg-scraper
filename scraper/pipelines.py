@@ -5,6 +5,8 @@
 # Don'''t forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import re
+import os
+import logging
 from functools import wraps
 import psycopg2
 from .items import Team, Player
@@ -23,11 +25,11 @@ def check_pipeline(process_item_method):
 class BasePipeline(object):
     def open_spider(self, spider):
         self.db_conn = psycopg2.connect(
-            host="aws-us-east-1-portal.4.dblayer.com",
-            dbname="compose",
-            user="admin",
-            password="FBRMKDOJVVLFGTIW",
-            port=33037
+            host=os.environ['COMPOSE_DB_HOST'],
+            dbname=os.environ['COMPOSE_DB_NAME'],
+            user=os.environ['COMPOSE_DB_USER'],
+            password=os.environ['COMPOSE_DB_PW'],
+            port=os.environ['COMPOSE_DB_PORT']
         )
 
         self.cur = self.db_conn.cursor()
@@ -48,8 +50,8 @@ class PlayerPipeline(BasePipeline):
 
     def insert_player(self, player):
         position_id = self.fetch_player_position_id(player)
-
-        self.cur.execute('''INSERT INTO player(ingame_name, position_id, residence_region) VALUES(%s, %s) ON CONFLICT DO NOTHING''', (player['name'], position_id))
+        residency_region_id = self.fetch_residency_region_id(player)
+        self.cur.execute('''INSERT INTO player(ingame_name, position_id, residency_region_id) VALUES(%s, %s) ON CONFLICT ON CONSTRAINT player_region_id_fk DO UPDATE SET (residency_region_id) = (EXCLUDED.residency_region_id) ''', (player['name'], position_id, residency_region_id))
 
 
     def insert_current_team(self, player):
@@ -67,29 +69,38 @@ class PlayerPipeline(BasePipeline):
         self.cur.execute('''SELECT id FROM player WHERE ingame_name = %s;''', (player['name'],))
         return self.cur.fetchone()[0]
 
-    def fetch_residence_region_id(self, player):
-        self.cur.execute('''SELECT residence_region_id FROM player WHERE name = %s''', (player['name'],))
+    def fetch_residency_region_id(self, player):
+        self.cur.execute('''SELECT id FROM region WHERE name = %s''', (player['residency_region'],))
+        return self.cur.fetchone()[0]
+
+    def fetch_region_id(self, region_name):
+        self.cur.execute('''SELECT id FROM region WHERE name = %s''', (region_name, ))
+        return self.cur.fetchone()[0]
+
+    def fetch_region_name(self, region_id):
+        self.cur.execute('''SELECT naem FROM region WHERE id = %s''', (region_id,))
         return self.cur.fetchone()[0]
 
 
-    def get_region_for_soloqueue_id(self, residence_region, soloqueue_id):
+    def get_region_for_soloqueue_id(self, residency_region_name, soloqueue_id):
         region_in_name_rx = r"\w+\s\(\w+\)"
         region_in_name = re.search(region_in_name, soloqueue_id)
         if region_in_name is not None:
             return region_in_name
         else:
-            return residence_region
+            return residency_region_name
 
     def insert_soloqueue_ids(self, player):
-        residence_region = self.fetch_residence_region_id(player)
+        residency_region = player['residency_region']
         soloqueue_ids = player.soloqueue_ids
 
-        regions = [self.get_region_for_soloqueue_id(residence_region, soloqueue_id) for soloqueue_id in soloqueue_ids]
+        player_id = self.fetch_player_id(player)
+
+        regions = [self.get_region_for_soloqueue_id(residency_region, soloqueue_id) for soloqueue_id in soloqueue_ids]
         ids_mapped_to_regions = zip(soloqueue_ids, regions)
 
         for (soloqueue_id, region) in ids_mapped_to_regions:
-            self.cur.execute('''INSERT INTO soloqueue_id(player_id, name, region_id) VALUES(%s, %s) ON CONFLICT DO NOTHING''', (soloqueue_id, region_id))
-        pass
+            self.cur.execute('''INSERT INTO soloqueue_id(player_id, name, region_id) VALUES(%s, %s) ON CONFLICT DO NOTHING''', (player_id, soloqueue_id, region_id))
 
     @check_pipeline
     def process_item(self, item, spider):
@@ -98,7 +109,7 @@ class PlayerPipeline(BasePipeline):
         self.insert_soloqueue_ids(player)
 
         self.db_conn.commit()
-    pass
+        return item
 
 
 class TeamPipeline(BasePipeline):

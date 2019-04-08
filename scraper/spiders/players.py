@@ -25,12 +25,17 @@ def get_teams_from_region(response):
         response.xpath("//span[contains(@class, 'teamname')]/a/text()").extract()
     )
 
+def get_residency_region(response):
+    return response.xpath('//td[contains(text(), "Residency")]/following-sibling::td[1]//div[contains(@class, "region-icon")]/text()').extract()[0]
+
+
 def get_player_data(response) -> Player:
     sq_ids = response.xpath('//td[contains(text(), "Soloqueue IDs")]/following-sibling::td/text()').extract()
     position = response.xpath('//td[contains(text(), "Role")]/following-sibling::td[1]/text()').extract()[0]
     return Player({
         "team_name": response.meta["team_name"],
         "region": response.meta["region"][0],
+        "residency_region": get_residency_region(response),
         "name": response.xpath('//h1[contains(@id, firstHeading)]/text()').extract()[0],
         "position": map_position(position),
         "soloqueue_ids": [s.strip() for s in sq_ids[0].split(',')] if len(sq_ids) > 0 else sq_ids

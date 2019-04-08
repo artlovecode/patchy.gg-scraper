@@ -1,6 +1,6 @@
 import scrapy
 from ..items import Team
-from ..pipelines import Team as TeamPipeline
+from ..pipelines import TeamPipeline
 
 url_to_region = {
             "https://lol.gamepedia.com/Category:North_American_Teams": "NA",

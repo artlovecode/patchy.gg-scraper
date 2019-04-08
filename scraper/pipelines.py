@@ -51,7 +51,7 @@ class PlayerPipeline(BasePipeline):
     def insert_player(self, player):
         position_id = self.fetch_player_position_id(player)
         residency_region_id = self.fetch_residency_region_id(player)
-        self.cur.execute('''INSERT INTO player(ingame_name, position_id, residency_region_id) VALUES(%s, %s) ON CONFLICT ON CONSTRAINT player_region_id_fk DO UPDATE SET (residency_region_id) = (EXCLUDED.residency_region_id) ''', (player['name'], position_id, residency_region_id))
+        self.cur.execute('''INSERT INTO player(ingame_name, position_id, residency_region_id) VALUES(%s, %s, %s)''', (player['name'], position_id, residency_region_id))
 
 
     def insert_current_team(self, player):
@@ -92,7 +92,7 @@ class PlayerPipeline(BasePipeline):
 
     def insert_soloqueue_ids(self, player):
         residency_region = player['residency_region']
-        soloqueue_ids = player.soloqueue_ids
+        soloqueue_ids = player['soloqueue_ids']
 
         player_id = self.fetch_player_id(player)
 
@@ -103,13 +103,13 @@ class PlayerPipeline(BasePipeline):
             self.cur.execute('''INSERT INTO soloqueue_id(player_id, name, region_id) VALUES(%s, %s) ON CONFLICT DO NOTHING''', (player_id, soloqueue_id, region_id))
 
     @check_pipeline
-    def process_item(self, item, spider):
+    def process_item(self, player, spider):
         self.insert_player(player)
         self.insert_current_team(player)
         self.insert_soloqueue_ids(player)
 
         self.db_conn.commit()
-        return item
+        return player 
 
 
 class TeamPipeline(BasePipeline):

@@ -1,4 +1,5 @@
 import logging
+from dotenv import load_dotenv
 # -*- coding: utf-8 -*-
 
 # Scrapy settings for scraper project
@@ -15,7 +16,7 @@ BOT_NAME = 'scraper'
 SPIDER_MODULES = ['scraper.spiders']
 NEWSPIDER_MODULE = 'scraper.spiders'
 
-LOG_LEVEL = logging.ERROR
+LOG_LEVEL = logging.DEBUG
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -68,7 +69,8 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'scraper.pipelines.ScraperPipeline': 300,
+    'scraper.pipelines.TeamPipeline': 300,
+    'scraper.pipelines.PlayerPipeline': 400
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

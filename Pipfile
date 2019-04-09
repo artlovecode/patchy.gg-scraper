@@ -45,6 +45,7 @@ Twisted = "==18.9.0"
 websocket_client = "==0.56.0"
 "zope.interface" = "==4.6.0"
 psycopg2-binary = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.6"

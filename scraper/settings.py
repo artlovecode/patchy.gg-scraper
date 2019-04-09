@@ -1,5 +1,6 @@
 import logging
 from dotenv import load_dotenv
+load_dotenv()
 # -*- coding: utf-8 -*-
 
 # Scrapy settings for scraper project

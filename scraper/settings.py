@@ -1,6 +1,7 @@
 import logging
-from dotenv import load_dotenv
-load_dotenv()
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(dotenv_path=os.path.join(os.path.abspath(os.path.dirname(__file__)), ".env"))
 # -*- coding: utf-8 -*-
 
 # Scrapy settings for scraper project
@@ -13,6 +14,14 @@ load_dotenv()
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'scraper'
+
+
+COMPOSE_DB_HOST = os.environ['COMPOSE_DB_HOST']
+COMPOSE_DB_NAME = os.environ['COMPOSE_DB_NAME']
+COMPOSE_DB_USER = os.environ['COMPOSE_DB_USER']
+COMPOSE_DB_PW = os.environ['COMPOSE_DB_PW']
+COMPOSE_DB_PORT = os.environ['COMPOSE_DB_PORT']
+
 
 SPIDER_MODULES = ['scraper.spiders']
 NEWSPIDER_MODULE = 'scraper.spiders'

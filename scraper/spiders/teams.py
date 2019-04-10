@@ -27,7 +27,7 @@ def get_teams_from_region(response):
 class Teams(scrapy.Spider):
     name = "gamepedia_teams"
 
-    pipelines = [
+    pipeline = [
         TeamPipeline
     ]
 

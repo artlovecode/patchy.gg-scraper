@@ -7,6 +7,7 @@
 import re
 import os
 import logging
+import settings
 from functools import wraps
 import psycopg2
 from .items import Team, Player
@@ -25,11 +26,11 @@ def check_pipeline(process_item_method):
 class BasePipeline(object):
     def open_spider(self, spider):
         self.db_conn = psycopg2.connect(
-            host=os.environ['COMPOSE_DB_HOST'],
-            dbname=os.environ['COMPOSE_DB_NAME'],
-            user=os.environ['COMPOSE_DB_USER'],
-            password=os.environ['COMPOSE_DB_PW'],
-            port=os.environ['COMPOSE_DB_PORT']
+            host = settings.COMPOSE_DB_HOST,
+            dbname = settings.COMPOSE_DB_NAME,
+            user = settings.COMPOSE_DB_USER,
+            password = settings.COMPOSE_DB_PW,
+            port = settings.COMPOSE_DB_PORT
         )
 
         self.cur = self.db_conn.cursor()
@@ -37,6 +38,20 @@ class BasePipeline(object):
     def close_spider(self, spider):
         self.cur.close()
         self.db_conn.close()
+
+
+class FixupPlayer(BasePipeline):
+    def fixup_soloqueue_ids(self, soloqueue_ids):
+        no_empty = lambda ids: filter(lambda id: id is not '', ids)
+        no_trailing_or_leading_whitespace = lambda ids: map(str.strip, ids)
+        apply_rules = lambda ids: no_trailing_or_leading_whitespace(no_empty(ids))
+
+        return apply_rules(soloqueue_ids)
+
+    @check_pipeline
+    def process_item(self, player, spider):
+        player.soloqueue_ids = self.fixup_soloqueue_ids(player.soloqueue_ids)
+        return player
 
 
 class PlayerPipeline(BasePipeline):
@@ -113,7 +128,6 @@ class PlayerPipeline(BasePipeline):
 
 
 class TeamPipeline(BasePipeline):
-
     @check_pipeline
     def process_item(self, team, spider):
         names = team["name"]

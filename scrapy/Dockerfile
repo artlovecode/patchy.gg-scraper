@@ -1,6 +1,4 @@
-FROM scrapinghub/scrapinghub-stack-scrapy:1.6-py3
-ENV TERM xterm
-ENV SCRAPY_SETTINGS_MODULE scraper.settings
+FROM python:3.7-alpine
 RUN mkdir -p /app
 WORKDIR /app
 COPY ./requirements.txt /app/requirements.txt

@@ -7,7 +7,7 @@
 import re
 import os
 import logging
-import settings
+from .settings import DB_PW, DB_HOS, DB_NAME, COMPOSE_DB_PORT,DB_PORTR
 from functools import wraps
 import psycopg2
 from .items import Team, Player
@@ -26,11 +26,11 @@ def check_pipeline(process_item_method):
 class BasePipeline(object):
     def open_spider(self, spider):
         self.db_conn = psycopg2.connect(
-            host = settings.COMPOSE_DB_HOST,
-            dbname = settings.COMPOSE_DB_NAME,
-            user = settings.COMPOSE_DB_USER,
-            password = settings.COMPOSE_DB_PW,
-            port = settings.COMPOSE_DB_PORT
+            host = DB_HOS,
+            dbname = DB_NAME,
+            user = DB_USER,
+            password = DB_PW,
+            port = DB_PORT
         )
 
         self.cur = self.db_conn.cursor()

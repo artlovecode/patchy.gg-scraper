@@ -1,7 +1,8 @@
 import logging
 import os
 from dotenv import load_dotenv, find_dotenv
-load_dotenv(dotenv_path=os.path.join(os.path.abspath(os.path.dirname(__file__)), ".env"))
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(dotenv_path = os.path.join(BASE_DIR, '.env'))
 # -*- coding: utf-8 -*-
 
 # Scrapy settings for scraper project
@@ -15,12 +16,19 @@ load_dotenv(dotenv_path=os.path.join(os.path.abspath(os.path.dirname(__file__)),
 
 BOT_NAME = 'scraper'
 
+def get_env_var(name):
+    if name in os.environ.keys():
+        return os.environ[name]
+    elif 'SHUB_SETTINGS' in os.environ.keys() and name in os.environ['SHUB_SETTINGS'].keys():
+        return os.environ['SHUB_SETTINGS'][name]
+    else:
+        raise Exception('{} not found in environment'.format(name))
 
-COMPOSE_DB_HOST = os.environ['COMPOSE_DB_HOST']
-COMPOSE_DB_NAME = os.environ['COMPOSE_DB_NAME']
-COMPOSE_DB_USER = os.environ['COMPOSE_DB_USER']
-COMPOSE_DB_PW = os.environ['COMPOSE_DB_PW']
-COMPOSE_DB_PORT = os.environ['COMPOSE_DB_PORT']
+DB_HOS = get_env_var('DB_HOST')
+DB_NAME = get_env_var('DB_NAME')
+DB_USER = get_env_var('DB_USER')
+DB_PW = get_env_var('DB_PW')
+DB_PORT = get_env_var('DB_PORT')
 
 
 SPIDER_MODULES = ['scraper.spiders']

@@ -6,4 +6,6 @@ matrix:
 jobs:
   include:
     - stage: test
-    script: cd functions && yarn test
+      script: cd functions && yarn test
+    - stage: deploy
+      script: cd functions && yarn deploy

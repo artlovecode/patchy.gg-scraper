@@ -1,11 +1,4 @@
 language: node_js
 node_js:
   "10"
-matrix:
-  fast_finish: true
-jobs:
-  include:
-    - stage: test
-      script: cd functions && yarn test
-    - stage: deploy
-      script: cd functions && yarn deploy
+script: cd functions && yarn test

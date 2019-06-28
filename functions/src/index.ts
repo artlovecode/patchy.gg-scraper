@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import {Region} from './@types/types'
+import {Region} from '../@types/types'
 import {scrape, parseTeamsFromRegion} from './scraper'
 
 // // Start writing Firebase Functions

@@ -16,12 +16,14 @@
   },
   "scripts": {
     "lint": "eslint --fix src/**/*.ts",
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
     "eslint-plugin-import": "^2.17.3",
+    "jest": "^24.8.0",
     "static-server": "^2.2.1",
     "ts-jest": "^24.0.2",
     "typescript": "^3.5.2"

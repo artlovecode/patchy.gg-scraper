@@ -1,7 +1,7 @@
 
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import {Region, Team} from './@types/types'
+import {Region, Team} from '../@types/types'
 
 export const parseTeamsFromRegion = (regionHtml: string, region: Region): Team[] => {
   const $ = cheerio.load(regionHtml);

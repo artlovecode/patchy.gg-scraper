@@ -8,12 +8,15 @@
     "strict": true,
     "target": "es2017",
     "typeRoots": [
-      "./src/@types",
+      "@types",
       "./node_modules/@types"
     ]
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "src", "@types", "__tests__"
+  ],
+  "exclude": [
+    "__tests__", "src/**/*.spec.ts", "src/**/*.test.ts"
   ]
 }

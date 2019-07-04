@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {Region} from '../@types/types'
-import {scrape, parseTeamsFromRegion} from './scraper'
+import {scrapeRegions, parseTeamsFromRegion} from './scraper'
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -25,7 +25,7 @@ export const scrapeTeams = functions.pubsub
     ]
     console.info(`Scraping ${urls.length} base urls`)
 
-    scrape(urls)
+    scrapeRegions(urls)
       .then(responses => {
         responses.map(response=> {
           const team = parseTeamsFromRegion(response.data, Region.NA)

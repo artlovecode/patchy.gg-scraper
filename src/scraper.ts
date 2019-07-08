@@ -25,14 +25,13 @@ export const parseTeamsFromRegion = (
   })
 }
 
-
 const mapStringToRole = (roleString: string): Role => {
   const map: Record<string, Role> = {
     'top laner': Role.TOP,
     jungler: Role.JUNGLE,
     'mid laner': Role.MID,
     'bot laner': Role.BOTTOM,
-    support: Role.SUPPORT,
+    support: Role.SUPPORT
   }
   const role = map[roleString.toLowerCase()]
 
@@ -65,7 +64,7 @@ const mapStringToRegion = (regionString: string): Region => {
 }
 
 export const parsePlayer = (html: string): Player | null => {
-  if(!html) {
+  if (!html) {
     return null
   }
   const $playerParser = cheerio.load(html)
@@ -116,8 +115,7 @@ export const parsePlayer = (html: string): Player | null => {
 }
 
 export const scrapePlayer = (url: string) => {
-  return axios.get(url)
-    .then(response => response.data)
+  return axios.get(url).then(response => response.data)
 }
 
 export const scrapeRegions = (urls: string[]) =>

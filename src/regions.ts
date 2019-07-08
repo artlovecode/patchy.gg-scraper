@@ -1,4 +1,4 @@
-import { APIGatewayEvent, Context, Callback, Handler } from 'aws-lambda'
+import { APIGatewayEvent, Context, Handler } from 'aws-lambda'
 import { scrapeRegions, parseTeamsFromRegion } from './scraper/scraper'
 import { Region } from '../@types/types'
 

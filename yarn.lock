@@ -473,6 +473,11 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
+"@types/aws-lambda@^8.10.27":
+  version "8.10.27"
+  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.27.tgz#33366bb26d8fb116f414e7c1855df5a0b6aa1d3d"
+  integrity sha512-9QjcjORRtgG5KPVHWqGZ0F2Uo/ALUWQ5D7qfJEco0fEjoSbA908w05RXql7YPS72jQ1w6I+pr+8pQPqBPlYnSw==
+
 "@types/babel__core@^7.1.0":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.2.tgz#608c74f55928033fce18b99b213c16be4b3d114f"

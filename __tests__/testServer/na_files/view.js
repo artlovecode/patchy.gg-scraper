@@ -1,0 +1,1 @@
+var beacon_id = "HG1KPgpyH5"; var session_id = "Bia2SPHuEr"; var varnishTime = "Mon, 24 Jun 2019 21:11:44 GMT";

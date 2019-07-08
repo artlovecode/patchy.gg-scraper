@@ -4,6 +4,5 @@ import { Region } from '../@types/types'
 
 consola.wrapAll()
 
-export const scrapeTeams = (event:any, context:any, callback:any) => {
+export const scrapeTeams = (event: any, context: any, callback: any) => {
 
-}

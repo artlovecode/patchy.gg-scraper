@@ -3,12 +3,12 @@ export enum Region {
   EU,
   KR,
   CN,
-  LM,
+  LMS,
   BR,
   CI,
   JP,
   LA,
-  OC,
+  OCE,
   SE,
   TR,
   VN,
@@ -21,6 +21,8 @@ export enum Role {
   MID,
   BOTTOM,
   SUPPORT,
+  COACH,
+  ANALYST,
   NONE
 }
 

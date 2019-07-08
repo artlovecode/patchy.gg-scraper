@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio'
 import axios from 'axios'
-import { Region, Role, Team, Player } from '../@types/types'
+import { Region, Role, Team, Player } from '../../@types/types'
 
 const regionURLs: Record<string, Region> = {
   'https://lol.gamepedia.com/Category:North_American_Teams': Region.NA,
@@ -31,6 +31,7 @@ export const parseTeamsFromRegion = (
   regionHtml: string,
   region: Region
 ): Team[] => {
+  console.log('parsing teams')
   const $ = cheerio.load(regionHtml)
   const teams = $('.wikitable > tbody:nth-child(1) > tr').toArray()
   return teams.map(team => {

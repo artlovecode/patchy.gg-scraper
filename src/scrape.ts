@@ -1,18 +1,20 @@
-import consola from 'consola'
 import { APIGatewayEvent, Context, Callback, Handler } from 'aws-lambda'
-import { scrapeRegions, parseTeamsFromRegion } from './scraper'
+import { scrapeRegions, parseTeamsFromRegion } from './scraper/scraper'
 import { Region } from '../@types/types'
 
-consola.wrapAll()
-
-export const scrape: Handler = async (
+export const handler: Handler = async (
   event: APIGatewayEvent,
   context: Context,
   callback: Callback
 ) => {
-  const regionHTMLs = await scrapeRegions([])
+  const regionHTMLs = await scrapeRegions(['https://lol.gamepedia.com/Category:North_American_Teams'])
   const teamsByRegions = regionHTMLs
     .map(response => response.data)
     .map(html => parseTeamsFromRegion(html, Region.NA))
-  const playersByTeam = teamsByRegions
+  return {
+    body: JSON.stringify({
+      data: teamsByRegions
+    }),
+    statusCode: 200
+  }
 }

@@ -1,4 +1,4 @@
-import * as scraper from '../src/scraper'
+import * as scraper from '../src/scraper/scraper'
 import {resolve} from 'url'
 import {join} from 'path'
 //@ts-ignore

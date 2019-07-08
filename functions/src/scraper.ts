@@ -25,18 +25,19 @@ export const parseTeamsFromRegion = (
   })
 }
 
-const stringToRoleMap: Record<string, Role> = {
-  'top laner': Role.TOP,
-  jungler: Role.JUNGLE,
-  'mid laner': Role.MID,
-  'bottom laner': Role.BOTTOM,
-  support: Role.SUPPORT
-}
-const mapStringToRole = (roleString: string): Role => {
-  const role = stringToRoleMap[roleString.toLowerCase()]
 
-  if (!role) {
-    throw new Error(`${roleString} is not a valid role`)
+const mapStringToRole = (roleString: string): Role => {
+  const map: Record<string, Role> = {
+    'top laner': Role.TOP,
+    jungler: Role.JUNGLE,
+    'mid laner': Role.MID,
+    'bot laner': Role.BOTTOM,
+    support: Role.SUPPORT,
+  }
+  const role = map[roleString.toLowerCase()]
+
+  if (!Role[role]) {
+    return Role.NONE
   }
 
   return role
@@ -45,19 +46,28 @@ const mapStringToRole = (roleString: string): Role => {
 const mapStringToRegion = (regionString: string): Region => {
   const map: Record<string, Region> = {
     'north america': Region.NA,
-    europe: Region.EU
+    europe: Region.EU,
+    korea: Region.KR,
+    brazil: Region.BR,
+    oceania: Region.OCE,
+    turkey: Region.TR,
+    japan: Region.JP,
+    china: Region.CN
   }
 
   const region = map[regionString.toLowerCase()]
 
   if (!Region[region]) {
-    throw new Error(`${regionString.toLowerCase()} is not a valid region`)
+    return Region.NONE
   }
 
   return region
 }
 
-export const parsePlayer = (html: string): Player => {
+export const parsePlayer = (html: string): Player | null => {
+  if(!html) {
+    return null
+  }
   const $playerParser = cheerio.load(html)
   const infoboxLabels = $playerParser('.infobox-label')
 
@@ -94,6 +104,7 @@ export const parsePlayer = (html: string): Player => {
     .text()
     .trim()
     .split(',')
+    .map(str => str.trim())
 
   return {
     ingameName: $playerParser('th.infobox-title').text(),
@@ -106,6 +117,7 @@ export const parsePlayer = (html: string): Player => {
 
 export const scrapePlayer = (url: string) => {
   return axios.get(url)
+    .then(response => response.data)
 }
 
 export const scrapeRegions = (urls: string[]) =>

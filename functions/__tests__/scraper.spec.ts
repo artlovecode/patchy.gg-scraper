@@ -3,7 +3,7 @@ import {resolve} from 'url'
 import {join} from 'path'
 //@ts-ignore
 const StaticServer = require('static-server')
-import { Region } from '../@types/types';
+import { Region, Role } from '../@types/types';
 
 
 const PORT = 8080
@@ -76,14 +76,24 @@ test('should find links to player pages', async done => {
 })
 
 test('should find player info in player pages', async done => {
+    expect.assertions(1)
     const naTeams = await responseHolder
-    const playerLinks = naTeams.filter(({ currentActiveRosterLinks }) => currentActiveRosterLinks.length > 0).map(team => team.currentActiveRosterLinks)
-    const playerHtml = await scraper.scrapePlayer(playerLinks[0][0])
-    const player = scraper.parsePlayer(playerHtml.data)
-    console.log(player)
-    expect(player)
+    const playerLinks = naTeams
+        .filter(({ currentActiveRosterLinks }) => currentActiveRosterLinks.length > 0)
+        .map(team => team.currentActiveRosterLinks)
+        .reduce((a, b) => a.concat(b))
+    const playerHtml = await Promise.all(playerLinks.map(scraper.scrapePlayer).map(p => p.catch(() => null)))
+    const players = playerHtml.map(html => scraper.parsePlayer(html))
+    const amazing = players.find(p => p && p.ingameName === 'Amazing')
+    expect(amazing).toEqual({
+        ingameName: 'Amazing',
+        role: Role.JUNGLE,
+        residencyRegion: Region.NA,
+        team: '100 Thieves',
+        soloQIds: [ "FNC Amazingx", "OG Amazing (KR)", "TSM Amazingx (KR)" ]
+    })
     done()
-})
+}, 600000)
 
 afterAll(() => {
     server.stop()

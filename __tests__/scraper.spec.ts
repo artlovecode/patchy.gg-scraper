@@ -1,4 +1,4 @@
-import * as scraper from '../src/scraper'
+import * as scraper from '../src/scraper/scraper'
 import {resolve} from 'url'
 import {join} from 'path'
 //@ts-ignore
@@ -73,6 +73,12 @@ test('should find links to player pages', async done => {
     const c9RosterLinks = rosterLinks.filter(team => team.teamName === 'Cloud9').map(e => e.rosterLinks)[0]
     expect(c9RosterLinks).toContain('https://lol.gamepedia.com/Goldenglue')
     done()
+})
+
+test('should get correct region from URL', () => {
+    expect.assertions(1)
+    const region = scraper.getRegionFromURL("https://lol.gamepedia.com/Category:North_American_Teams")
+    expect(region).toEqual(Region.NA)
 })
 
 test('should find player info in player pages', async done => {

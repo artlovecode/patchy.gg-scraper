@@ -2,6 +2,31 @@ import * as cheerio from 'cheerio'
 import axios from 'axios'
 import { Region, Role, Team, Player } from '../@types/types'
 
+const regionURLs: Record<string, Region> = {
+  'https://lol.gamepedia.com/Category:North_American_Teams': Region.NA,
+  'https://lol.gamepedia.com/Category:Chinese_Teams': Region.CN,
+  'https://lol.gamepedia.com/Category:Korean_Teams': Region.KR,
+  'https://lol.gamepedia.com/Category:LMS_Teams': Region.LMS,
+  'https://lol.gamepedia.com/Category:Brazilian_Teams': Region.BR,
+  'https://lol.gamepedia.com/Category:CIS_Teams': Region.CIS,
+  'https://lol.gamepedia.com/Category:Japanese_Teams': Region.JP,
+  'https://lol.gamepedia.com/Category:Latin_American_Teams': Region.LAT,
+  'https://lol.gamepedia.com/Category:Oceanic_Teams': Region.OCE,
+  'https://lol.gamepedia.com/Category:Southeast_Asian_Teams': Region.SEA,
+  'https://lol.gamepedia.com/Category:Turkish_Teams': Region.TR,
+  'https://lol.gamepedia.com/Category:Vietnamese_Teams': Region.VN,
+  'https://lol.gamepedia.com/Category:European_Teams': Region.EU
+}
+
+export const getRegionFromURL = (url: string): Region => {
+  const region = regionURLs[url]
+  if (!Region[region]) {
+    return Region.NONE
+  }
+
+  return region
+}
+
 export const parseTeamsFromRegion = (
   regionHtml: string,
   region: Region
@@ -51,7 +76,9 @@ const mapStringToRegion = (regionString: string): Region => {
     oceania: Region.OCE,
     turkey: Region.TR,
     japan: Region.JP,
-    china: Region.CN
+    china: Region.CN,
+    vietnam: Region.VN,
+    'southeast asia': Region.SEA
   }
 
   const region = map[regionString.toLowerCase()]
@@ -69,7 +96,6 @@ export const parsePlayer = (html: string): Player | null => {
   }
   const $playerParser = cheerio.load(html)
   const infoboxLabels = $playerParser('.infobox-label')
-
   const role = mapStringToRole(
     infoboxLabels
       .filter(':contains("Role")')
@@ -117,6 +143,5 @@ export const parsePlayer = (html: string): Player | null => {
 export const scrapePlayer = (url: string) => {
   return axios.get(url).then(response => response.data)
 }
-
 export const scrapeRegions = (urls: string[]) =>
   Promise.all(urls.map(url => axios.get(url)))

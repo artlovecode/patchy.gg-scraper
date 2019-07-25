@@ -31,6 +31,7 @@ module.exports = {
         "import/prefer-default-export": "off",
         "array-callback-return": "off",
         "no-console": "off",
-        "@typescript-eslint/indent": "off"
+        "@typescript-eslint/indent": "off",
+        "@typescript-eslint/no-explicit-any": "off"
     }
 };

@@ -18,7 +18,7 @@
     "lint": "eslint ./src/**/* --ext .js,.ts",
     "test": "jest",
     "build": "tsc",
-    "deploy:dev": "sls deploy --stage dev",
+    "deploy:dev": "sls deploy",
     "deploy:prod": "sls deploy --stage production"
   },
   "devDependencies": {

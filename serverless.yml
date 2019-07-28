@@ -12,8 +12,6 @@
 # Happy Coding!
 
 service: patchy-gg-functions
-app: patchy-gg-functions
-tenant: artlovecode
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details

@@ -18,8 +18,8 @@
     "lint": "eslint ./src/**/* --ext .js,.ts",
     "test": "jest",
     "build": "tsc",
-    "deploy:dev": "sls deploy",
-    "deploy:prod": "sls deploy --stage production"
+    "deploy:dev": "serverless deploy",
+    "deploy:prod": "serverless deploy --stage production"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.27",

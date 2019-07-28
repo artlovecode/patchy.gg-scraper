@@ -1,9 +1,6 @@
 import { Handler, Context, APIGatewayEvent } from 'aws-lambda'
 
-export const handler: Handler = async (
-  event: APIGatewayEvent,
-  context: Context
-) => {
+const handler: Handler = async (event: APIGatewayEvent, context: Context) => {
   return {
     body: JSON.stringify([
       {
@@ -13,3 +10,5 @@ export const handler: Handler = async (
     statusCode: 200
   }
 }
+
+export default handler

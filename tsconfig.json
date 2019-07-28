@@ -3,13 +3,13 @@
     "module": "commonjs",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "outDir": "functions",
+    "outDir": "dist",
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
     "typeRoots": ["@types", "./node_modules/@types"]
   },
   "compileOnSave": true,
-  "include": ["src", "@types", "__tests__"],
+  "include": ["src/*.ts", "@types"],
   "exclude": ["__tests__", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }

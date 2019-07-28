@@ -11,9 +11,9 @@
 #
 # Happy Coding!
 
-service: patchy-gg-scraper
-#app: your-app-name
-#tenant: your-tenant-name
+service: patchy-gg-functions
+app: patchy-gg-functions
+tenant: artlovecode
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -57,8 +57,8 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
+  players:
+    handler: dist/src/handler.players
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

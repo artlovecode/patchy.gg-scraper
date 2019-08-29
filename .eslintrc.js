@@ -1,37 +1,24 @@
 module.exports = {
-    "env": {
-        "es6": true,
-        "node": true,
-        "jest": true
-    },
-    "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint"],
-    "extends": [
-        "airbnb-base", 
-        "plugin:prettier/recommended",
-        "prettier",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
-    },
-    "settings": {
-        "import/resolver": {
-            "node": {
-                "extensions": ['.js', '.ts']
-            }
-        }
-    },
-    "parserOptions": {
-        "ecmaVersion": 2018,
-        "sourceType": "module"
-    },
-    "rules": {
-        "import/prefer-default-export": "off",
-        "array-callback-return": "off",
-        "no-console": "off",
-        "@typescript-eslint/indent": "off",
-        "@typescript-eslint/no-explicit-any": "off"
-    }
-};
+  env: {
+    es6: true,
+    node: true
+  },
+  plugins: ['jest', 'prettier'],
+  extends: ['airbnb-base', 'plugin:jest/recommended'],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly'
+  },
+  parserOptions: {
+    ecmaVersion: 2018,
+    sourceType: 'module'
+  },
+  rules: {
+    'arrow-parens': 'off',
+    'prettier/prettier': 'error',
+    semi: 'off',
+    'comma-dangle': 'off',
+    'arrow-body-style': 'off',
+    'spaced-comment': 'off'
+  }
+}

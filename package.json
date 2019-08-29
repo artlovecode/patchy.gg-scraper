@@ -10,9 +10,7 @@
     "aws-lambda": "^0.1.2",
     "axios": "^0.19.0",
     "cheerio": "^1.0.0-rc.3",
-    "consola": "^2.9.0",
-    "eslint": "^6.0.0",
-    "eslint-config-airbnb-base": "^13.1.0"
+    "consola": "^2.9.0"
   },
   "scripts": {
     "lint": "eslint ./src/**/* --ext .js,.ts",
@@ -21,14 +19,21 @@
     "deploy:dev": "serverless deploy",
     "deploy:prod": "serverless deploy --stage production"
   },
+  "pre-commit": {
+    "yarn lint --fix"
+  },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.27",
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
+    "eslint": "^6.2.1",
+    "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.0.0",
-    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jest": "^22.15.2",
     "eslint-plugin-prettier": "^3.1.0",
     "jest": "^24.8.0",
+    "pre-commit": "^1.2.2",
     "prettier": "^1.18.2",
     "serverless": "^1.48.3",
     "static-server": "^2.2.1",

@@ -34,21 +34,23 @@ export const parseTeamsFromRegion = (
   console.log('parsing teams')
   const $ = cheerio.load(regionHtml)
   const teams = $('.wikitable > tbody:nth-child(1) > tr').toArray()
-  return teams.map(team => {
-    const $teamParser = cheerio.load(team)
-    const name = $teamParser('.teamname > a').text()
-    const currentActiveRoster = $teamParser('td:nth-child(3) a')
-    return {
-      name,
-      currentActiveRoster: currentActiveRoster
-        .toArray()
-        .map(e => cheerio(e).text()),
-      currentActiveRosterLinks: currentActiveRoster
-        .toArray()
-        .map(e => cheerio(e).attr('href')),
-      region
+  return teams.map(
+    (team): Team => {
+      const $teamParser = cheerio.load(team)
+      const name = $teamParser('.teamname > a').text()
+      const currentActiveRoster = $teamParser('td:nth-child(3) a')
+      return {
+        name,
+        currentActiveRoster: currentActiveRoster
+          .toArray()
+          .map((e): string => cheerio(e).text()),
+        currentActiveRosterLinks: currentActiveRoster
+          .toArray()
+          .map((e): string => cheerio(e).attr('href')),
+        region
+      }
     }
-  })
+  )
 }
 
 const mapStringToRole = (roleString: string): Role => {
@@ -111,7 +113,7 @@ export const parsePlayer = (html: string): Player | null => {
       .next()
       .children()
       .contents()
-      .filter((index, e) => e.type === 'text')
+      .filter((index, e): boolean => e.type === 'text')
       .text()
       .trim()
   )
@@ -130,7 +132,7 @@ export const parsePlayer = (html: string): Player | null => {
     .text()
     .trim()
     .split(',')
-    .map(str => str.trim())
+    .map((str): string => str.trim())
 
   return {
     ingameName: $playerParser('th.infobox-title').text(),
@@ -141,8 +143,8 @@ export const parsePlayer = (html: string): Player | null => {
   }
 }
 
-export const scrapePlayer = (url: string) => {
-  return axios.get(url).then(response => response.data)
+export const scrapePlayer = (url: string): Promise<string> => {
+  return axios.get(url).then((response): string => response.data)
 }
-export const scrapeRegions = (urls: string[]) =>
-  Promise.all(urls.map(url => axios.get(url)))
+export const scrapeRegions = (urls: string[]): Promise<string[]> =>
+  Promise.all(urls.map((url): Promise<string> => axios.get(url)))

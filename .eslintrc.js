@@ -3,8 +3,9 @@ module.exports = {
     es6: true,
     node: true
   },
-  plugins: ['jest', 'prettier'],
-  extends: ['airbnb-base', 'plugin:jest/recommended'],
+  plugins: ['jest', 'prettier', 'import/typescript'],
+  extends: ['airbnb-base', 'plugin:jest/recommended', 'prettier'],
+  parser: '@typescript-eslint/parser',
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly'
@@ -14,11 +15,6 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
-    'arrow-parens': 'off',
     'prettier/prettier': 'error',
-    semi: 'off',
-    'comma-dangle': 'off',
-    'arrow-body-style': 'off',
-    'spaced-comment': 'off'
   }
 }

@@ -16,6 +16,8 @@ export enum Region {
   NONE,
 }
 
+
+
 export enum Role {
   TOP,
   JUNGLE,
@@ -28,11 +30,11 @@ export enum Role {
 }
 
 export type Player = {
-  ingameName: string;
-  team: string;
-  role: Role;
-  residencyRegion: Region;
-  soloQIds: string[];
+  ingameName: string| null;
+  team: string | null;
+  role: Role | null;
+  residencyRegion: Region | null;
+  soloQIds: string[] | null;
 };
 
 export type Team = {

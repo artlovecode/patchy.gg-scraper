@@ -14,14 +14,15 @@
   },
   "scripts": {
     "lint": "eslint ./src/**/* --ext .js,.ts",
+    "fix": "eslint --fix ./src/**/*",
     "test": "jest",
     "build": "tsc",
     "deploy:dev": "serverless deploy",
     "deploy:prod": "serverless deploy --stage production"
   },
-  "pre-commit": {
-    "yarn lint --fix"
-  },
+  "pre-commit": [
+    "yarn fix"
+  ],
   "devDependencies": {
     "@types/aws-lambda": "^8.10.27",
     "@typescript-eslint/eslint-plugin": "^1.11.0",

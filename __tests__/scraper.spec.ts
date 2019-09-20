@@ -1,7 +1,7 @@
 import { resolve } from 'url'
 import { join } from 'path'
 import * as scraper from '../src/scraper/scraper'
-import { Region, Role } from '../@types/types'
+import { Region, Role} from '../@types/types'
 //@ts-ignore
 const StaticServer = require('static-server')
 
@@ -35,8 +35,12 @@ const ResponseHolder = async () => {
   const baseUrl = `http://localhost:${PORT}`
   const endpoints = ['/na.html']
   const urls = endpoints.map(endpoint => resolve(baseUrl, endpoint))
-  const responses = await scraper.scrapeRegions(urls)
-  return responses.map(html => scraper.parseTeamsFromRegion(html, Region.NA))[0]
+  try {
+    const responses = await scraper.scrapeRegions(urls)
+    return responses.map(( { data } ) => new scraper.TeamGetter(data , Region.NA).getTeams())[0]
+  } catch(e) {
+    throw e
+  }
 }
 
 const responseHolder = ResponseHolder()
@@ -44,6 +48,7 @@ const responseHolder = ResponseHolder()
 test('should parse teamnames correctly', async done => {
   expect.assertions(1)
   const naTeams = await responseHolder
+
   const naTeamNames = naTeams.map(t => t.name)
   expect(naTeamNames).toContain('Team SoloMid')
   done()
@@ -82,9 +87,8 @@ test('should find links to player pages', async done => {
 
 test('should get correct region from URL', () => {
   expect.assertions(1)
-  const region = scraper.getRegionFromURL(
-    'https://lol.gamepedia.com/Category:North_American_Teams'
-  )
+  console.log(scraper.regionUrlMapper.map)
+  const region = scraper.regionUrlMapper.find('https://lol.gamepedia.com/Category:North_American_Teams')
   expect(region).toEqual(Region.NA)
 })
 
@@ -100,7 +104,7 @@ test('should find player info in player pages', async done => {
   const playerHtml = await Promise.all(
     playerLinks.map(scraper.scrapePlayer).map(p => p.catch(() => null))
   )
-  const players = playerHtml.map(html => scraper.parsePlayer(html))
+  const players = playerHtml.map((html: string | null)=> scraper.parsePlayer(html))
   const amazing = players.find(p => p && p.ingameName === 'Amazing')
   expect(amazing).toEqual({
     ingameName: 'Amazing',

@@ -89,7 +89,7 @@ test('should find links to player pages', async done => {
 
 test('should get correct region from URL', () => {
   expect.assertions(1)
-  const region = scraper.regionUrlMapper.find('https://lol.gamepedia.com/category:north_american_teams')
+  const region = scraper.regionUrlMapper.find('https://lol.gamepedia.com/Category:North_American_Teams')
   expect(region).toEqual(Region.NA)
 })
 

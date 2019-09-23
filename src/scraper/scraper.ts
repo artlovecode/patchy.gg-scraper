@@ -22,19 +22,19 @@ class Mapper<T>{
 }
 
 const regionURLs: Record<string, Region> = {
-  'https://lol.gamepedia.com/category:north_american_teams': Region.NA,
-  'https://lol.gamepedia.com/category:chinese_teams': Region.CN,
-  'https://lol.gamepedia.com/category:korean_teams': Region.KR,
-  'https://lol.gamepedia.com/category:lms_teams': Region.LMS,
-  'https://lol.gamepedia.com/category:brazilian_teams': Region.BR,
-  'https://lol.gamepedia.com/category:cis_teams': Region.CIS,
-  'https://lol.gamepedia.com/category:japanese_teams': Region.JP,
-  'https://lol.gamepedia.com/category:latin_american_teams': Region.LAT,
-  'https://lol.gamepedia.com/category:oceanic_teams': Region.OCE,
-  'https://lol.gamepedia.com/category:southeast_asian_teams': Region.SEA,
-  'https://lol.gamepedia.com/category:turkish_teams': Region.TR,
-  'https://lol.gamepedia.com/category:vietnamese_teams': Region.VN,
-  'https://lol.gamepedia.com/category:european_teams': Region.EU
+  'https://lol.gamepedia.com/Category:North_American_Teams': Region.NA,
+  'https://lol.gamepedia.com/Category:Chinese_Teams': Region.CN,
+  'https://lol.gamepedia.com/Category:Korean_Teams': Region.KR,
+  'https://lol.gamepedia.com/Category:LMS_Teams': Region.LMS,
+  'https://lol.gamepedia.com/Category:Brazilian_Teams': Region.BR,
+  'https://lol.gamepedia.com/Category:CIS_Teams': Region.CIS,
+  'https://lol.gamepedia.com/Category:Japanese_Teams': Region.JP,
+  'https://lol.gamepedia.com/Category:Latin_American_Teams': Region.LAT,
+  'https://lol.gamepedia.com/Category:Oceanic_Teams': Region.OCE,
+  'https://lol.gamepedia.com/Category:Southeast_Asian_Teams': Region.SEA,
+  'https://lol.gamepedia.com/Category:Turkish_Teams': Region.TR,
+  'https://lol.gamepedia.com/Category:Vietnamese_Teams': Region.VN,
+  'https://lol.gamepedia.com/Category:European_Teams': Region.EU
 }
 
 

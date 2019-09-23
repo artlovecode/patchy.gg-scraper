@@ -22,19 +22,19 @@ class Mapper<T>{
 }
 
 const regionURLs: Record<string, Region> = {
-  'https://lol.gamepedia.com/Category:North_American_Teams': Region.NA,
-  'https://lol.gamepedia.com/Category:Chinese_Teams': Region.CN,
-  'https://lol.gamepedia.com/Category:Korean_Teams': Region.KR,
-  'https://lol.gamepedia.com/Category:LMS_Teams': Region.LMS,
-  'https://lol.gamepedia.com/Category:Brazilian_Teams': Region.BR,
-  'https://lol.gamepedia.com/Category:CIS_Teams': Region.CIS,
-  'https://lol.gamepedia.com/Category:Japanese_Teams': Region.JP,
-  'https://lol.gamepedia.com/Category:Latin_American_Teams': Region.LAT,
-  'https://lol.gamepedia.com/Category:Oceanic_Teams': Region.OCE,
-  'https://lol.gamepedia.com/Category:Southeast_Asian_Teams': Region.SEA,
-  'https://lol.gamepedia.com/Category:Turkish_Teams': Region.TR,
-  'https://lol.gamepedia.com/Category:Vietnamese_Teams': Region.VN,
-  'https://lol.gamepedia.com/Category:European_Teams': Region.EU
+  'https://lol.gamepedia.com/category:north_american_teams': Region.NA,
+  'https://lol.gamepedia.com/category:chinese_teams': Region.CN,
+  'https://lol.gamepedia.com/category:korean_teams': Region.KR,
+  'https://lol.gamepedia.com/category:lms_teams': Region.LMS,
+  'https://lol.gamepedia.com/category:brazilian_teams': Region.BR,
+  'https://lol.gamepedia.com/category:cis_teams': Region.CIS,
+  'https://lol.gamepedia.com/category:japanese_teams': Region.JP,
+  'https://lol.gamepedia.com/category:latin_american_teams': Region.LAT,
+  'https://lol.gamepedia.com/category:oceanic_teams': Region.OCE,
+  'https://lol.gamepedia.com/category:southeast_asian_teams': Region.SEA,
+  'https://lol.gamepedia.com/category:turkish_teams': Region.TR,
+  'https://lol.gamepedia.com/category:vietnamese_teams': Region.VN,
+  'https://lol.gamepedia.com/category:european_teams': Region.EU
 }
 
 
@@ -61,7 +61,6 @@ const regionMap: Record<string, Region> = {
 
 
 export const regionUrlMapper = new Mapper<Region>(regionURLs)
-console.log(regionURLs['https://lol.gamepedia.com/Category:North_American_Teams'])
 
 
 export class TeamGetter {
@@ -94,12 +93,13 @@ export class TeamGetter {
 
 class PlayerInbox {
   private parser: CheerioStatic
-  private infoBoxLabels: Cheerio
+  public infoBoxLabels: Cheerio
   private regionMapper: Mapper<Region>
   private roleMapper: Mapper<Role>
   constructor(html: string) {
     this.parser = cheerio.load(html)
     this.infoBoxLabels = this.parser('.infobox-labels')
+
     this.regionMapper = new Mapper<Region>(regionMap)
     this.roleMapper = new Mapper<Role>(roleMap)
   }
@@ -107,15 +107,14 @@ class PlayerInbox {
     return this.parser('th.infobox-title').text()
   }
   getRole(): Role | null {
-    const roleText = this.infoBoxLabels
+    const roleNode = this.parser('.infobox-label')
       .filter(':contains("Role")')
-      .first()
-      .next()
-      .text()
-    return this.roleMapper.find(roleText)
+
+    const roleText = roleNode.first().next().text()
+    return this.roleMapper.find(roleText.toLowerCase())
   }
   getResidencyRegion(): Region | null {
-    const regionText = this.infoBoxLabels
+    const regionText = this.parser('.infobox-label')
       .filter(':contains("Residency")')
       .next()
       .children()
@@ -123,10 +122,10 @@ class PlayerInbox {
       .filter((index, e): boolean => e.type === 'text')
       .text()
       .trim()
-    return this.regionMapper.find(regionText)
+    return this.regionMapper.find(regionText.toLowerCase())
   }
   getTeam(): string {
-    return this.infoBoxLabels
+    return this.parser('.infobox-label')
       .filter(':contains("Team")')
       .first()
       .next()
@@ -134,7 +133,7 @@ class PlayerInbox {
       .trim()
   }
   getSoloQIds(): string[] {
-    return this.infoBoxLabels
+    return this.parser('.infobox-label')
       .filter(':contains("Soloqueue IDs")')
       .first()
       .next()
@@ -158,6 +157,10 @@ export const parsePlayer = (html: string | null): Player | null => {
   const soloQIds = infoBox.getSoloQIds() 
   const ingameName = infoBox.getName()
 
+  if (ingameName === 'Amazing') {
+    console.log(infoBox.infoBoxLabels.html())
+  }
+
   return {
     ingameName,
     role,
@@ -169,5 +172,6 @@ export const parsePlayer = (html: string | null): Player | null => {
 
 export const scrapePlayer = (url: string): Promise<string> =>
   axios.get(url).then((response): string => response.data)
+
 export const scrapeRegions = (urls: string[]): Promise<any[]> =>
   Promise.all(urls.map((url:any): Promise<string> => axios.get(url)))

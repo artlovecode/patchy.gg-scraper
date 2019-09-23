@@ -13,13 +13,6 @@ const server = new StaticServer({
   port: PORT
 })
 
-beforeAll(() => {
-  return new Promise(promiseResolve => {
-    server.start(() => {
-      promiseResolve()
-    })
-  })
-})
 
 const serverReady = () => {
   return new Promise(promiseResolve => {
@@ -42,6 +35,15 @@ const ResponseHolder = async () => {
     throw e
   }
 }
+
+beforeAll(() => {
+  return new Promise(promiseResolve => {
+    server.start(() => {
+      promiseResolve()
+    })
+  })
+})
+
 
 const responseHolder = ResponseHolder()
 
@@ -87,8 +89,7 @@ test('should find links to player pages', async done => {
 
 test('should get correct region from URL', () => {
   expect.assertions(1)
-  console.log(scraper.regionUrlMapper.map)
-  const region = scraper.regionUrlMapper.find('https://lol.gamepedia.com/Category:North_American_Teams')
+  const region = scraper.regionUrlMapper.find('https://lol.gamepedia.com/category:north_american_teams')
   expect(region).toEqual(Region.NA)
 })
 
@@ -101,12 +102,11 @@ test('should find player info in player pages', async done => {
     )
     .map(team => team.currentActiveRosterLinks)
     .reduce((a, b) => a.concat(b))
-  const playerHtml = await Promise.all(
-    playerLinks.map(scraper.scrapePlayer).map(p => p.catch(() => null))
-  )
-  const players = playerHtml.map((html: string | null)=> scraper.parsePlayer(html))
-  const amazing = players.find(p => p && p.ingameName === 'Amazing')
-  expect(amazing).toEqual({
+
+  const p = await scraper.scrapePlayer(playerLinks[0])
+
+  const player = scraper.parsePlayer(p)
+  expect(player).toEqual({
     ingameName: 'Amazing',
     role: Role.JUNGLE,
     residencyRegion: Region.NA,

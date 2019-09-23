@@ -1,9 +1,9 @@
 {
-  "name": "functions",
+  "name": "patchy-gg-scraper",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "private": true,
+  "entry": "./dist/src/scraper/scraper.js",
   "dependencies": {
     "@types/cheerio": "^0.22.11",
     "@types/jest": "^24.0.15",

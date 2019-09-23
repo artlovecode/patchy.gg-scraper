@@ -2,6 +2,25 @@ import * as cheerio from 'cheerio'
 import axios from 'axios'
 import { Region, Role, Team, Player } from '../../@types/types'
 
+
+class Mapper<T>{
+  public map: Record<string, T>
+
+  constructor(map: Record<string, T>) {
+    this.map = map
+  }
+
+  find(item: string): T | null {
+    const foundItem = this.map[item]
+
+    if (foundItem === undefined) {
+      return null
+    }
+
+    return foundItem
+  }
+}
+
 const regionURLs: Record<string, Region> = {
   'https://lol.gamepedia.com/Category:North_American_Teams': Region.NA,
   'https://lol.gamepedia.com/Category:Chinese_Teams': Region.CN,
@@ -18,122 +37,132 @@ const regionURLs: Record<string, Region> = {
   'https://lol.gamepedia.com/Category:European_Teams': Region.EU
 }
 
-export const getRegionFromURL = (url: string): Region => {
-  const region = regionURLs[url]
-  if (!Region[region]) {
-    return Region.NONE
-  }
 
-  return region
+const roleMap: Record<string, Role> = {
+  'top laner': Role.TOP,
+  jungler: Role.JUNGLE,
+  'mid laner': Role.MID,
+  'bot laner': Role.BOTTOM,
+  support: Role.SUPPORT
 }
 
-export const parseTeamsFromRegion = (
-  regionHtml: string,
-  region: Region
-): Team[] => {
-  console.log('parsing teams')
-  const $ = cheerio.load(regionHtml)
-  const teams = $('.wikitable > tbody:nth-child(1) > tr').toArray()
-  return teams.map(team => {
-    const $teamParser = cheerio.load(team)
-    const name = $teamParser('.teamname > a').text()
-    const currentActiveRoster = $teamParser('td:nth-child(3) a')
+const regionMap: Record<string, Region> = {
+  'north america': Region.NA,
+  europe: Region.EU,
+  korea: Region.KR,
+  brazil: Region.BR,
+  oceania: Region.OCE,
+  turkey: Region.TR,
+  japan: Region.JP,
+  china: Region.CN,
+  vietnam: Region.VN,
+  'southeast asia': Region.SEA
+}
+
+
+export const regionUrlMapper = new Mapper<Region>(regionURLs)
+
+
+export class TeamGetter {
+  private parser: CheerioStatic
+  private region: Region
+  constructor(regionHtml: string, region: Region) {
+    this.region = region
+    this.parser = cheerio.load(regionHtml)
+  }
+
+  parseTeam(teamHtml: CheerioElement ): Team {
+    const teamParser = cheerio.load(teamHtml)
+    const name = teamParser('.teamname > a').text()
+    const rosterHtml = teamParser('td:nth-child(3) a').toArray()
+    const currentActiveRoster = rosterHtml
+      .map((html): string => cheerio(html).text())
+    const currentActiveRosterLinks = rosterHtml
+      .map((html): string => cheerio(html).attr('href'))
+
     return {
-      name,
-      currentActiveRoster: currentActiveRoster
-        .toArray()
-        .map(e => cheerio(e).text()),
-      currentActiveRosterLinks: currentActiveRoster
-        .toArray()
-        .map(e => cheerio(e).attr('href')),
-      region
+      name, currentActiveRoster, currentActiveRosterLinks, region: this.region
     }
-  })
+  }
+
+  getTeams(): Team[] {
+    const teamHtmls = this.parser('.wikitable > tbody:nth-child(1) > tr').toArray()
+    return teamHtmls.map((html) => this.parseTeam(html))
+  }
 }
 
-const mapStringToRole = (roleString: string): Role => {
-  const map: Record<string, Role> = {
-    'top laner': Role.TOP,
-    jungler: Role.JUNGLE,
-    'mid laner': Role.MID,
-    'bot laner': Role.BOTTOM,
-    support: Role.SUPPORT
+class PlayerInbox {
+  private parser: CheerioStatic
+  public infoBoxLabels: Cheerio
+  private regionMapper: Mapper<Region>
+  private roleMapper: Mapper<Role>
+  constructor(html: string) {
+    this.parser = cheerio.load(html)
+    this.infoBoxLabels = this.parser('.infobox-labels')
+
+    this.regionMapper = new Mapper<Region>(regionMap)
+    this.roleMapper = new Mapper<Role>(roleMap)
   }
-  const role = map[roleString.toLowerCase()]
-
-  if (!Role[role]) {
-    return Role.NONE
+  getName(): string {
+    return this.parser('th.infobox-title').text()
   }
-
-  return role
-}
-
-const mapStringToRegion = (regionString: string): Region => {
-  const map: Record<string, Region> = {
-    'north america': Region.NA,
-    europe: Region.EU,
-    korea: Region.KR,
-    brazil: Region.BR,
-    oceania: Region.OCE,
-    turkey: Region.TR,
-    japan: Region.JP,
-    china: Region.CN,
-    vietnam: Region.VN,
-    'southeast asia': Region.SEA
-  }
-
-  const region = map[regionString.toLowerCase()]
-
-  if (!Region[region]) {
-    return Region.NONE
-  }
-
-  return region
-}
-
-export const parsePlayer = (html: string): Player | null => {
-  if (!html) {
-    return null
-  }
-  const $playerParser = cheerio.load(html)
-  const infoboxLabels = $playerParser('.infobox-label')
-  const role = mapStringToRole(
-    infoboxLabels
+  getRole(): Role | null {
+    const roleNode = this.parser('.infobox-label')
       .filter(':contains("Role")')
-      .first()
-      .next()
-      .text()
-  )
 
-  const residencyRegion = mapStringToRegion(
-    infoboxLabels
+    const roleText = roleNode.first().next().text()
+    return this.roleMapper.find(roleText.toLowerCase())
+  }
+  getResidencyRegion(): Region | null {
+    const regionText = this.parser('.infobox-label')
       .filter(':contains("Residency")')
       .next()
       .children()
       .contents()
-      .filter((index, e) => e.type === 'text')
+      .filter((index, e): boolean => e.type === 'text')
       .text()
       .trim()
-  )
+    return this.regionMapper.find(regionText.toLowerCase())
+  }
+  getTeam(): string {
+    return this.parser('.infobox-label')
+      .filter(':contains("Team")')
+      .first()
+      .next()
+      .text()
+      .trim()
+  }
+  getSoloQIds(): string[] {
+    return this.parser('.infobox-label')
+      .filter(':contains("Soloqueue IDs")')
+      .first()
+      .next()
+      .text()
+      .trim()
+      .split(',')
+      .map((str): string => str.trim())
+  }
+}
 
-  const team = infoboxLabels
-    .filter(':contains("Team")')
-    .first()
-    .next()
-    .text()
-    .trim()
 
-  const soloQIds = infoboxLabels
-    .filter(':contains("Soloqueue IDs")')
-    .first()
-    .next()
-    .text()
-    .trim()
-    .split(',')
-    .map(str => str.trim())
+export const parsePlayer = (html: string | null): Player | null => {
+  if (!html) {
+    return null
+  }
+  const infoBox = new PlayerInbox(html)
+
+  const role = infoBox.getRole()
+  const residencyRegion = infoBox.getResidencyRegion()
+  const team = infoBox.getTeam()
+  const soloQIds = infoBox.getSoloQIds() 
+  const ingameName = infoBox.getName()
+
+  if (ingameName === 'Amazing') {
+    console.log(infoBox.infoBoxLabels.html())
+  }
 
   return {
-    ingameName: $playerParser('th.infobox-title').text(),
+    ingameName,
     role,
     residencyRegion,
     team,
@@ -141,8 +170,8 @@ export const parsePlayer = (html: string): Player | null => {
   }
 }
 
-export const scrapePlayer = (url: string) => {
-  return axios.get(url).then(response => response.data)
-}
-export const scrapeRegions = (urls: string[]) =>
-  Promise.all(urls.map(url => axios.get(url)))
+export const scrapePlayer = (url: string): Promise<string> =>
+  axios.get(url).then((response): string => response.data)
+
+export const scrapeRegions = (urls: string[]): Promise<any[]> =>
+  Promise.all(urls.map((url:any): Promise<string> => axios.get(url)))
